@@ -1,2 +1,2 @@
 # dspico-doctor
-An open-source diagnostic, recovery, and enhancement toolkit for the DS Pico flash cartridge.
+An open-source diagnostic, recovery, and enhancement toolkit for the DSpico flash cartridge.
