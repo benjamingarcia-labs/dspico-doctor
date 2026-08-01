@@ -155,6 +155,77 @@ selected program's ARM9 entry point
 
 This path is confirmed through source inspection. It has not yet been build-verified, emulator-tested, or hardware-tested as part of DSpico Doctor.
 
+#### ARM7 Startup, Loading, and Boot Handoff
+
+Pico Loader ARM7 execution begins at the `_start` symbol in `arm7/source/crt0.s`. The linker selects `_start` as the entry point through `ENTRY(_start)` in `arm7/loader7.ld`.
+
+The ARM7 startup routine:
+
+- disables interrupts during initialization
+- clears the BSS section
+- sets the stack pointer to `0x0380FD80`
+- branches directly to `loaderMain()`
+
+`loaderMain()` initializes the C++ runtime, clears ARM7 sound registers, initializes interrupt and main-thread support, and synchronizes with ARM9. The processors use a four-part handshake through IPC synchronization bits. After the handshake, ARM9 reports whether the console is operating in DS or DSi mode.
+
+ARM7 then initializes its environment, heap, logger, real-time clock state, and selected storage interface. Depending on the loader configuration, it can mount DLDI-backed storage, the DSi SD interface, or AGB semihosting storage.
+
+`NdsLoader::Load()` coordinates the selected program's loading process. During a normal boot, ARM7 opens the selected `.nds` file, reads its ROM header, prepares shared boot memory, and loads both processor binaries:
+
+- the ARM9 binary is read into `arm9LoadAddress`
+- the ARM7 binary is read into `arm7LoadAddress`
+- DSi-mode programs may also include optional ARM9i and ARM7i binaries
+
+The load addresses identify where executable images are copied. The separate entry addresses identify where each processor begins execution after loading is complete.
+
+ARM7 and ARM9 use two IPC mechanisms:
+
+- IPC synchronization bits perform the startup handshake and communicate DS or DSi mode
+- the IPC FIFO carries 32-bit commands, arguments, completion signals, and returned memory addresses
+
+ARM7 owns the high-level loading workflow. ARM9 remains in a polling loop, receives FIFO commands from ARM7, and performs ARM9-specific operations. ARM7 loads the ARM9 executable, sends `IPC_COMMAND_ARM9_APPLY_PATCHES`, and continues loading the ARM7 executable while ARM9 applies its patches. ARM7 waits for ARM9's completion response before continuing with game-specific and ARM7 patch preparation.
+
+Shared memory holds structured boot information, including ROM headers, card identifiers, CRC values, firmware user settings, reset information, ROM offsets, boot type, and DS or DSi configuration data. ARM7 prepares most of this state before either processor enters the selected program.
+
+For some ARM7 patches, ARM9 generates or allocates patch resources and returns their addresses through the IPC FIFO. ARM7 preprocesses cheat data, temporarily adjusts WRAM mappings when required, copies the generated patch code through the ARM7-visible WRAM window, restores the previous mapping, and places the patch data into its final destination.
+
+The final handoff begins in `NdsLoader::StartRom()`. ARM7 waits for a display timing boundary, sends `IPC_COMMAND_ARM9_BOOT` and the soft-reset flag to ARM9, clears pending ARM7 interrupt flags, and calls the function address stored in `_romHeader.arm7EntryAddress`.
+
+The confirmed ARM7 control path is:
+
+```text
+_start
+        ↓
+loaderMain()
+        ↓
+NdsLoader::Load()
+        ↓
+load ARM9 and ARM7 executable images
+        ↓
+coordinate shared memory, IPC, and patching
+        ↓
+StartRom()
+        ↓
+send IPC_COMMAND_ARM9_BOOT
+        ↓
+selected program's ARM7 entry point
+```
+
+The combined final handoff is:
+
+```text
+ARM7                                      ARM9
+-----                                     ----
+StartRom()
+send IPC_COMMAND_ARM9_BOOT  ------------> handleArm7Command()
+clear pending ARM7 interrupts              handleBootCommand()
+call arm7EntryAddress                      bootArm9()
+        ↓                                      ↓
+selected program's ARM7                selected program's ARM9
+```
+
+These findings are based on Pico Loader source inspection at commit ad2055669b1d5e115d9261c83dc7be3e09a5f2b6, tagged v1.7.1. They have not yet been build-verified, emulator-tested, or hardware-tested as part of DSpico Doctor.
+
 ### Pico Launcher
 
 Repository:
@@ -486,16 +557,19 @@ The following have been confirmed through upstream source inspection:
 * `loaderMain()` synchronizes with ARM7 and waits for ARM7 commands through the IPC FIFO
 * `IPC_COMMAND_ARM9_BOOT` leads through `handleBootCommand()` and `bootArm9()`
 * the final ARM9 handoff loads `romHeader->arm9EntryAddress` into the program counter through `pop {pc}`
+* Pico Loader ARM7 execution begins at `_start` in `arm7/source/crt0.s`
+* ARM7 synchronizes with ARM9 through IPC synchronization bits before loading begins
+* ARM7 opens the selected `.nds` file and loads both the ARM9 and ARM7 executable images
+* shared memory stores structured boot data while the IPC FIFO carries commands, arguments, responses, and pointers
+* ARM7 coordinates ARM9 patching while continuing ARM7-side loading work
+* ARM7 sends `IPC_COMMAND_ARM9_BOOT` before calling `_romHeader.arm7EntryAddress`
 
 ## Remaining Questions
 
 The following details still require further source inspection:
 
-* the complete ARM7 responsibilities in the bootloader and Pico Loader
 * the full NTR and TWL switching sequence
 * the exact SDIO transaction implementation
-* the Pico Loader ARM7 startup, loading, command, and final handoff sequence
-* how the ARM7 and ARM9 loading responsibilities fit together before both processors enter the selected program
 * how Pico Launcher requests and starts selected software
 * which portions of the system are covered by automated tests
 * how maintainers currently validate firmware changes
