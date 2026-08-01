@@ -299,6 +299,57 @@ DMA and PIO
 Nintendo DS memory
 ```
 
+## DLDI microSD Write Path
+
+Nintendo DS software writes storage through the standard DLDI interface.
+
+For a sector write, the DSpico DLDI driver:
+
+1. divides the request into 512-byte sectors
+2. sends command `0xF6` with the target sector and transfer flags
+3. sends a 512-byte payload from Nintendo DS memory to the DSpico
+4. polls until the firmware is ready for the next block
+5. repeats until all sectors are written
+
+The transfer flags identify whether a block is:
+
+- the first block
+- a middle block
+- the final block
+- both first and final for a single-sector write
+
+On the RP2040 side, the firmware:
+
+1. validates the write command
+2. prepares to receive a 512-byte payload
+3. stores the incoming data in an RP2040 RAM buffer
+4. invokes a completion callback when the payload is complete
+5. starts or queues the physical microSD write
+6. reports readiness before the next block proceeds
+
+The full path is:
+
+```text
+Nintendo DS memory
+        ↓
+DSpico DLDI
+        ↓
+command `0xF6`
+        ↓
+RP2040 cartridge-command handler
+        ↓
+RP2040 RAM buffer
+        ↓
+SdCard subsystem
+        ↓
+SDIO
+        ↓
+microSD card
+
+The firmware alternates between two 512-byte buffers during multi-sector writes. This allows one sector to be written to the microSD card while the next sector is received from the Nintendo DS.
+
+Writes require more coordination than reads because interrupted or incorrectly sequenced writes can affect stored data. The source shows readiness checks, transfer-boundary flags, callbacks, and buffer sequencing, but this project has not verified write behavior on hardware.
+
 ## Buffering
 
 The firmware uses two 512-byte buffers for sequential SD reads.
