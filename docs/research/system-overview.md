@@ -113,6 +113,48 @@ The DSpico bootloader uses Pico Loader functions to start:
 
 `fat:/_picoboot.nds`
 
+#### ARM9 Startup and Boot Handoff
+
+The Pico Loader ARM9 does not begin in a conventional C++ `main()` function. Execution starts at the `_start` symbol in `arm9/source/crt0.s`.
+
+The startup routine:
+
+- disables interrupts during initialization
+- configures CP15, the memory protection unit, caches, and write buffering
+- configures ITCM and DTCM
+- copies the ITCM and DTCM sections into place
+- clears the BSS section
+- creates stacks for the SVC, IRQ, and system processor modes
+- branches to `loaderMain()`
+
+`loaderMain()` completes C++ runtime initialization, clears graphics memory, synchronizes with ARM7, configures IPC FIFO communication, detects DS or DSi mode, initializes the heap, selects a loader-platform implementation, and waits for commands from ARM7.
+
+When ARM7 sends `IPC_COMMAND_ARM9_BOOT`, the command dispatcher calls `handleBootCommand()`. This handler temporarily maps the Nintendo DS and Game Boy Advance cartridge interfaces to ARM9, performs platform-specific ROM preparation, clears ARM9 hardware state, configures DSi-mode registers when required, and then calls `bootArm9()`.
+
+`bootArm9()` clears loader-related VRAM, finalizes DS or DSi hardware state, clears pending interrupt flags, reads the loaded ROM header from shared memory, and passes `romHeader->arm9EntryAddress` to `jumpToArm9EntryPoint()`.
+
+`jumpToArm9EntryPoint()` preserves the entry address on the stack, clears the general-purpose registers except the stack pointer, and executes `pop {pc}`. Loading the saved address into the program counter directly transfers ARM9 execution to the selected Nintendo DS program. Pico Loader does not expect ARM9 execution to return afterward.
+
+The confirmed ARM9 control path is:
+
+```text
+_start
+        ↓
+loaderMain()
+        ↓
+handleArm7Command()
+        ↓
+handleBootCommand()
+        ↓
+bootArm9()
+        ↓
+jumpToArm9EntryPoint()
+        ↓
+selected program's ARM9 entry point
+```
+
+This path is confirmed through source inspection. It has not yet been build-verified, emulator-tested, or hardware-tested as part of DSpico Doctor.
+
 ### Pico Launcher
 
 Repository:
@@ -190,7 +232,7 @@ bootloader asks Pico Loader to start fat:/_picoboot.nds
 Pico Launcher starts
         ↓
 user selects Nintendo DS software
-````
+```
 
 ## Firmware ROM Emulation
 
@@ -345,6 +387,7 @@ SdCard subsystem
 SDIO
         ↓
 microSD card
+```
 
 The firmware alternates between two 512-byte buffers during multi-sector writes. This allows one sector to be written to the microSD card while the next sector is received from the Nintendo DS.
 
@@ -438,6 +481,11 @@ The following have been confirmed through upstream source inspection:
 * SD sectors are transferred in 512-byte units
 * the firmware uses double buffering for sequential SD reads
 * a failed microSD mount causes the firmware to enter BOOTSEL mode
+* Pico Loader ARM9 execution begins at `_start` in `arm9/source/crt0.s`
+* `_start` prepares the ARM9 processor and memory environment before branching to `loaderMain()`
+* `loaderMain()` synchronizes with ARM7 and waits for ARM7 commands through the IPC FIFO
+* `IPC_COMMAND_ARM9_BOOT` leads through `handleBootCommand()` and `bootArm9()`
+* the final ARM9 handoff loads `romHeader->arm9EntryAddress` into the program counter through `pop {pc}`
 
 ## Remaining Questions
 
@@ -446,8 +494,8 @@ The following details still require further source inspection:
 * the complete ARM7 responsibilities in the bootloader and Pico Loader
 * the full NTR and TWL switching sequence
 * the exact SDIO transaction implementation
-* the complete DLDI write path
-* the internal Pico Loader program-loading sequence
+* the Pico Loader ARM7 startup, loading, command, and final handoff sequence
+* how the ARM7 and ARM9 loading responsibilities fit together before both processors enter the selected program
 * how Pico Launcher requests and starts selected software
 * which portions of the system are covered by automated tests
 * how maintainers currently validate firmware changes
