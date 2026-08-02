@@ -254,6 +254,65 @@ The file must be renamed because the bootloader searches specifically for:
 
 `fat:/_picoboot.nds`
 
+#### Selected Software Launch Path
+
+Pico Launcher prepares the selected file for Pico Loader rather than loading the selected Nintendo DS software itself.
+
+For an ordinary `.nds` file, `NdsFileType::TrySetLaunchParameters()` copies the selected file path into `pload_params_t::romPath`.
+
+For a custom file association, `CustomFileType::TrySetLaunchParameters()`:
+
+- copies the associated application's path into `romPath`
+- copies the selected file path into `arguments`
+- records the argument-buffer length in `argumentsLength`
+
+Before preparing these values, `RomBrowserController::SetPicoLoaderParams()` clears the save path and argument fields. The inspected Pico Launcher ARM9 source does not assign another save path during this launch flow.
+
+When launch parameters are prepared successfully, Pico Launcher changes to `PicoLoaderProcess`. That process disables both display controllers and calls `pload_start()`.
+
+The ARM9 bootstrap then:
+
+1. reads `/_pico/picoLoader9.bin`
+2. reads `/_pico/picoLoader7.bin`
+3. copies both binaries into VRAM
+4. writes the boot drive and launch parameters into the Pico Loader ARM7 header
+5. copies the launcher path when the loader supports API version 2 or newer
+6. supplies the cheat-data pointer when the loader supports API version 3 or newer
+7. remaps VRAM C and D for ARM7 access
+8. sends value `1` on `IPC_CHANNEL_LOADER`
+9. transfers ARM9 control to the Pico Loader ARM9 image at `0x06800000`
+
+The Pico Launcher ARM7 IPC handler receives the loader message and sets a start flag. The normal ARM7 state machine then selects `ExitMode::PicoLoader`, disables sound and interrupts, writes the DLDI driver pointer into the Pico Loader ARM7 header, and transfers control through the entry address stored in `header7->entryPoint`.
+
+The confirmed launcher-to-loader path is:
+
+```text
+user selects a file
+        ↓
+RomBrowserController::SetPicoLoaderParams()
+        ↓
+FileType::TrySetLaunchParameters()
+        ├── .nds file: selected path → romPath
+        └── custom file: associated app → romPath
+                         selected file → arguments
+        ↓
+PicoLoaderProcess::Run()
+        ↓
+launcher ARM9 loads Pico Loader ARM9 and ARM7 binaries
+        ↓
+launcher ARM9 populates the Pico Loader ARM7 header
+        ↓
+launcher ARM9 sends IPC_CHANNEL_LOADER value 1
+        ↓
+launcher ARM9 transfers control to Pico Loader ARM9
+        ↓
+launcher ARM7 state machine selects ExitMode::PicoLoader
+        ↓
+launcher ARM7 transfers control through header7->entryPoint
+```
+
+These findings are based on Pico Launcher source inspection at commit `d31a15c315237bd69ee9b3d5bc1351ae5e38b99c`. They have not yet been build-verified, emulator-tested, or hardware-tested as part of DSpico Doctor.
+
 ## Build-Time Flow
 
 The DSpico bootloader is first compiled as:
@@ -303,6 +362,14 @@ bootloader asks Pico Loader to start fat:/_picoboot.nds
 Pico Launcher starts
         ↓
 user selects Nintendo DS software
+        ↓
+Pico Launcher prepares the selected path and launch parameters
+        ↓
+Pico Launcher loads Pico Loader ARM9 and ARM7 binaries
+        ↓
+Pico Launcher signals ARM7 and transfers both processors into Pico Loader
+        ↓
+Pico Loader reads, prepares, patches, and starts the selected software
 ```
 
 ## Firmware ROM Emulation
@@ -563,6 +630,12 @@ The following have been confirmed through upstream source inspection:
 * shared memory stores structured boot data while the IPC FIFO carries commands, arguments, responses, and pointers
 * ARM7 coordinates ARM9 patching while continuing ARM7-side loading work
 * ARM7 sends `IPC_COMMAND_ARM9_BOOT` before calling `_romHeader.arm7EntryAddress`
+* Pico Launcher stores an ordinary selected `.nds` path in `pload_params_t::romPath`
+* custom file associations launch their configured application and pass the selected file path through `arguments`
+* Pico Launcher loads `picoLoader9.bin` and `picoLoader7.bin` into VRAM before transferring control
+* Pico Launcher writes boot, path, argument, launcher-return, and cheat information into the Pico Loader ARM7 header
+* launcher ARM9 signals launcher ARM7 with value `1` on `IPC_CHANNEL_LOADER`
+* launcher ARM7 enters Pico Loader through the entry address stored in `header7->entryPoint`
 
 ## Remaining Questions
 
@@ -570,7 +643,6 @@ The following details still require further source inspection:
 
 * the full NTR and TWL switching sequence
 * the exact SDIO transaction implementation
-* how Pico Launcher requests and starts selected software
 * which portions of the system are covered by automated tests
 * how maintainers currently validate firmware changes
 
