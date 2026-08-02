@@ -605,6 +605,95 @@ Runs on:
 
 Nintendo DS
 
+## Build and Validation Coverage
+
+The five core software repositories use different levels of build and validation support.
+
+### DSpico Firmware
+
+The firmware repository provides a local CMake build process through `CMakeLists.txt` and `compile.sh`.
+
+The build script:
+
+1. removes the previous `build/` directory
+2. configures the project with CMake
+3. builds the firmware
+4. produces `DSpico.uf2`
+
+No GitHub Actions workflow was found in the inspected repository.
+
+The firmware includes compile-time checks for required structure offsets and source-level assertion checks for selected SDIO and USB assumptions. Whether those runtime assertions remain enabled in the produced firmware build was not verified. These checks do not constitute an automated behavioral test suite.
+
+### DSpico Bootloader
+
+The bootloader repository has a GitHub Actions workflow that:
+
+1. checks out the repository and submodules
+2. runs `make`
+3. uploads `BOOTLOADER.nds`
+
+The inspected workflow and Makefiles compile and package the ARM7 and ARM9 programs. No automated unit, integration, emulator, or hardware test command was found.
+
+### DSpico DLDI
+
+The DLDI repository has a GitHub Actions workflow that:
+
+1. checks out the repository and submodules
+2. runs `make`
+3. uploads `DSpico.dldi`
+
+No automated behavioral test, emulator execution, or hardware-validation command was found in the inspected workflow or Makefile.
+
+### Pico Loader
+
+Pico Loader has GitHub Actions workflows that build and package multiple platform configurations.
+
+The nightly workflow builds 17 platform targets, including `DSPICO`, and uploads the resulting Pico Loader binaries and supporting data files.
+
+Pico Loader also contains compile-time assertions that verify required structure sizes, field offsets, shared-memory layouts, ROM-header layouts, and other binary interfaces.
+
+The source supports a `MELONDS` build configuration. Selecting:
+
+```text
+PICO_PLATFORM=MELONDS
+```
+
+causes the ARM9 build to define `PICO_LOADER_TARGET_MELONDS`, which selects `MelonDSLoaderPlatform`.
+
+The inspected GitHub Actions matrix does not include `MELONDS`, and no workflow was found that launches melonDS, executes a defined test case, or records a behavioral pass or failure.
+
+### Pico Launcher
+
+Pico Launcher has GitHub Actions workflows that run `make`, upload `LAUNCHER.nds` and the `_pico/` directory, and package release files.
+
+The source includes compile-time checks for selected binary layouts, register offsets, sprite dimensions, and data structures.
+
+No automated unit, integration, emulator, or hardware test command was found.
+
+### Validation Boundary
+
+A successful automated build confirms that the configured source compiled and that the expected artifacts were produced.
+
+It does not prove that:
+
+- the software starts correctly
+- ARM7 and ARM9 coordinate correctly at runtime
+- microSD reads and writes work on hardware
+- flashing succeeds
+- the launcher-to-loader transition works
+- selected software loads correctly
+- existing functionality remains unaffected
+
+The repository inspection found build automation and compile-time validation, but it did not find an automated behavioral, emulator, or hardware-in-the-loop test suite for the five core software repositories.
+
+The exact source revisions inspected were:
+
+- `LNH-team/dspico-firmware` — `472c9d8e9957ad18df367f14b9cc337b9b887e65`
+- `LNH-team/dspico-bootloader` — `29671d041fe2e497f8c39bae562e98d955afdbc5`
+- `LNH-team/dspico-dldi` — `8ba45f65690bc40d9279e663e1d89ca806451cc1`
+- `LNH-team/pico-loader` — `ad2055669b1d5e115d9261c83dc7be3e09a5f2b6`
+- `LNH-team/pico-launcher` — `d31a15c315237bd69ee9b3d5bc1351ae5e38b99c`
+
 ## Confirmed Findings
 
 The following have been confirmed through upstream source inspection:
@@ -636,6 +725,11 @@ The following have been confirmed through upstream source inspection:
 * Pico Launcher writes boot, path, argument, launcher-return, and cheat information into the Pico Loader ARM7 header
 * launcher ARM9 signals launcher ARM7 with value `1` on `IPC_CHANNEL_LOADER`
 * launcher ARM7 enters Pico Loader through the entry address stored in `header7->entryPoint`
+* DSpico Bootloader, DSpico DLDI, Pico Loader, and Pico Launcher use GitHub Actions for automated builds and artifact publishing
+* the inspected DSpico Firmware repository provides a local CMake build process but no GitHub Actions workflow
+* DSpico Firmware, Pico Loader, and Pico Launcher contain compile-time validation for selected structure layouts and interfaces
+* Pico Loader supports a `MELONDS` build configuration, but the inspected CI matrix does not build it
+* no automated unit, integration, emulator-execution, or hardware-in-the-loop test suite was found in the five inspected core software repositories
 
 ## Remaining Questions
 
@@ -643,7 +737,6 @@ The following details still require further source inspection:
 
 * the full NTR and TWL switching sequence
 * the exact SDIO transaction implementation
-* which portions of the system are covered by automated tests
 * how maintainers currently validate firmware changes
 
 ## Scope of This Document
