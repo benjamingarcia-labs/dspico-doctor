@@ -694,6 +694,29 @@ The exact source revisions inspected were:
 - `LNH-team/pico-loader` — `ad2055669b1d5e115d9261c83dc7be3e09a5f2b6`
 - `LNH-team/pico-launcher` — `d31a15c315237bd69ee9b3d5bc1351ae5e38b99c`
 
+### Maintainer Validation Evidence
+
+A targeted review of four upstream pull requests found that maintainers and contributors use several forms of visible validation evidence:
+
+* `LNH-team/pico-launcher` pull request `#77` reports testing on DSi hardware with a named `usrcheat.dat` source. Its `Build Pico Launcher` workflow completed successfully, but no direct maintainer review or independent reproduction was recorded. The pull request remained open when inspected.
+* `LNH-team/pico-launcher` pull request `#39` reports testing on a DSi and DS Lite with multiple hide patterns and garbage data. The contributor also reported discovering a settings-capacity problem during testing. No pull-request-triggered workflow, direct maintainer review, or independent reproduction was found. The pull request remained open when inspected.
+* `LNH-team/dspico-bootloader` pull request `#3` states only that the change was tested. No hardware model, software versions, test procedure, automated pull-request workflow, or direct maintainer review was recorded. The pull request remained open when inspected.
+* `LNH-team/pico-loader` pull request `#38` reports testing on DSpico v1.3 with Firmware v1.0. Its `Build Pico Loader` workflow completed successfully. A maintainer requested code-structure, enum, naming, file-organization, and project-style changes. The contributor revised the implementation, and the pull request was merged into `develop` as merge commit `19cce5960b204aef26477542cb399ec9df4ca8ca`.
+
+These examples show that visible validation may include:
+
+* contributor-reported hardware testing
+* automated compilation and artifact generation
+* maintainer review of code structure and project conventions
+* contributor revisions in response to review
+* final merge acceptance
+
+The level of testing detail was inconsistent. None of the inspected pull requests recorded a complete reproducible procedure containing the exact hardware configuration, test inputs, expected results, actual results, and independent confirmation.
+
+A merge confirms that the project accepted a particular revision. It does not by itself prove exhaustive runtime, compatibility, regression, emulator, or hardware validation.
+
+The pull-request states and workflow results above were inspected on 2026-08-02. They describe the visible evidence for these examples and do not establish a universal validation policy for every DSpico repository or change.
+
 ## Confirmed Findings
 
 The following have been confirmed through upstream source inspection:
@@ -737,7 +760,7 @@ The following details still require further source inspection:
 
 * the full NTR and TWL switching sequence
 * the exact SDIO transaction implementation
-* how maintainers currently validate firmware changes
+* how maintainers validate DSpico Firmware changes beyond the visible build and pull-request evidence
 
 ## Scope of This Document
 
