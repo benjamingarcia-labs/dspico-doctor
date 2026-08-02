@@ -1,0 +1,123 @@
+name: Feature request
+description: Propose a focused improvement based on a documented user or project need.
+title: "[Feature]: "
+labels:
+  - enhancement
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for proposing an improvement.
+
+        Before submitting, search existing issues and pull requests to confirm that the idea is not already proposed, implemented, or actively being developed.
+
+  - type: checkboxes
+    id: existing-work
+    attributes:
+      label: Existing work check
+      description: Confirm that you reviewed related project activity.
+      options:
+        - label: I searched existing issues and pull requests for related work.
+          required: true
+        - label: I reviewed the current project scope and documentation.
+          required: true
+
+  - type: textarea
+    id: user-problem
+    attributes:
+      label: User problem
+      description: Describe the problem this feature would solve.
+      placeholder: Who experiences the problem, and what difficulty do they encounter?
+    validations:
+      required: true
+
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence of need
+      description: Provide links, issue references, community discussions, observations, or other evidence that the problem exists.
+      placeholder: Include dates and source references when available.
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: Expected behavior
+      description: Describe what the smallest useful version of the feature should do.
+    validations:
+      required: true
+
+  - type: textarea
+    id: user-benefit
+    attributes:
+      label: Expected benefit
+      description: Explain how this change would improve usefulness, usability, reliability, compatibility, or maintainability.
+    validations:
+      required: true
+
+  - type: textarea
+    id: scope
+    attributes:
+      label: Proposed scope
+      description: Define what should be included and deliberately excluded.
+      placeholder: |
+        In scope:
+        -
+
+        Out of scope:
+        -
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Describe other approaches, workarounds, or reasons the current behavior may be retained.
+
+  - type: textarea
+    id: compatibility
+    attributes:
+      label: Compatibility and dependencies
+      description: Identify relevant hardware, firmware, software, upstream repositories, dependencies, or platform constraints.
+
+  - type: textarea
+    id: testing
+    attributes:
+      label: Testing considerations
+      description: Explain how the proposed behavior could be verified.
+      placeholder: |
+        Functional testing:
+        Regression testing:
+        Hardware testing:
+        Boundary or invalid-input testing:
+        Recovery testing:
+
+  - type: textarea
+    id: documentation
+    attributes:
+      label: Documentation requirements
+      description: Identify documentation that would need to be created or updated.
+
+  - type: textarea
+    id: risks
+    attributes:
+      label: Risks and maintenance cost
+      description: Describe technical risk, compatibility risk, user risk, maintenance burden, or possible unintended consequences.
+
+  - type: checkboxes
+    id: contribution-boundary
+    attributes:
+      label: Contribution boundary
+      options:
+        - label: I understand that acceptance of this proposal does not mean the feature is approved for implementation.
+          required: true
+        - label: I will not present an unmerged change as an official DSpico feature.
+          required: true
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional context
+      description: Add screenshots, diagrams, mockups, source references, or other useful information.
