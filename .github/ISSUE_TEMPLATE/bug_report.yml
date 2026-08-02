@@ -1,0 +1,107 @@
+name: Bug report
+description: Report reproducible incorrect or unexpected behavior.
+title: "[Bug]: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for reporting a problem.
+
+        Before submitting, search the existing issues and do not include passwords, access tokens, private keys, or other sensitive information.
+
+  - type: checkboxes
+    id: existing-issue
+    attributes:
+      label: Existing issue check
+      description: Confirm that this problem has not already been reported.
+      options:
+        - label: I searched the existing issues for this problem.
+          required: true
+
+  - type: textarea
+    id: observed-behavior
+    attributes:
+      label: Observed behavior
+      description: Describe what happened.
+      placeholder: Explain the incorrect or unexpected behavior.
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: Expected behavior
+      description: Describe what you expected to happen instead.
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction-steps
+    attributes:
+      label: Steps to reproduce
+      description: Provide the smallest repeatable sequence that causes the problem.
+      placeholder: |
+        1. Start with...
+        2. Run or select...
+        3. Observe...
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Provide the relevant hardware, software, firmware, operating system, repository commit, or release version.
+      placeholder: |
+        Hardware:
+        Operating system:
+        Firmware or software version:
+        Repository commit or tag:
+        Tools used:
+    validations:
+      required: true
+
+  - type: textarea
+    id: error-output
+    attributes:
+      label: Error messages or logs
+      description: Paste exact errors or relevant logs. Use code blocks where helpful.
+      render: shell
+
+  - type: dropdown
+    id: reproducibility
+    attributes:
+      label: Reproducibility
+      description: How consistently can you reproduce the problem?
+      options:
+        - Every time
+        - Sometimes
+        - Once
+        - Not yet reproduced
+    validations:
+      required: true
+
+  - type: textarea
+    id: recovery-attempts
+    attributes:
+      label: Recovery or troubleshooting attempted
+      description: Describe anything you tried and the result.
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional context
+      description: Add screenshots, diagrams, source references, or other relevant information.
+
+  - type: checkboxes
+    id: validation-boundary
+    attributes:
+      label: Validation boundary
+      description: Confirm the limits of the report.
+      options:
+        - label: I have separated observed behavior from assumptions or interpretation.
+          required: true
+        - label: I have identified anything that remains unverified.
+          required: true
