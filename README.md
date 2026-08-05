@@ -39,6 +39,7 @@ Planned capabilities should not be treated as implemented or supported until req
 
 - [Project Vision](docs/vision.md) — Describes the long-term direction and guiding principles of DSpico Doctor.
 - [Project Charter](docs/project-charter.md) — Defines the initial user problem, scope, non-goals, constraints, risks, and research questions.
+- [Project Roadmap](docs/roadmap.md) — Defines the project's phase gates from foundational research through deliverable selection, implementation, validation, and release preparation.
 
 ### Research
 
