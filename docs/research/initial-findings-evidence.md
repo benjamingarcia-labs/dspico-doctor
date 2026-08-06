@@ -21,7 +21,7 @@ The register is time-bounded. It records what was inspected, where the evidence 
 
 - **Source:** `LNH-team/dspico` project index
 - **Repository or authority:** Official upstream
-- **Revision or item:** `develop` branch, `README.md` content blob `ccd4f28d1d75c6e5c5a3c93f89908c69f37f214b`
+- **Revision or item:** `develop` branch, `README.md` content blob `51d979ccac53cca75607da0b1984590a796c22ed`
 - **Inspection date:** 2026-08-05
 - **Evidence use:** Confirms that DSpico is organized across separate repositories for hardware, firmware, bootloader, DLDI, Wrfuxxed, Pico Launcher, Pico Loader, and USB examples.
 - **Evidence classification:** Official upstream
