@@ -6,7 +6,11 @@ This directory contains research and technical notes used to guide DSpico Doctor
 
 ### [Initial Research Findings](initial-findings.md)
 
-Records the initial review of the DSpico repositories, documentation, releases, issues, pull requests, community evidence, and possible contribution candidates.
+Records the initial review of the DSpico repositories, documentation, releases, issues, pull requests, direct user observations, and possible contribution candidates.
+
+### [Initial Research Evidence Register](initial-findings-evidence.md)
+
+Provides exact sources, revisions, inspection dates, evidence classifications, validation limits, and reverification instructions for the source-dependent claims in the initial findings.
 
 ### [DSpico System Overview](system-overview.md)
 
@@ -14,6 +18,8 @@ Explains how the major DSpico components interact, including the RP2040 firmware
 
 ## Purpose
 
-These documents separate confirmed findings from assumptions, recommendations, unresolved questions, and proposed work.
+These documents separate confirmed findings from direct observations, inference, assumptions, recommendations, unresolved questions, and proposed work.
 
-They are research records rather than official DSpico documentation.
+Research records are time-bounded rather than permanently current. Reverify affected source-dependent evidence before relying on it for a consequential project decision. The evidence register defines the maintenance procedure for the initial findings.
+
+These are independent DSpico Doctor research records rather than official DSpico documentation.
