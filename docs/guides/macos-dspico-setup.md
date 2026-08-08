@@ -67,7 +67,6 @@ The initial validated host is macOS 26.5.2, build 25F84. If `uname -m` does not 
 Run:
 
 ```bash
-git --version
 curl --version
 shasum --help >/dev/null && echo "shasum available"
 diskutil list >/dev/null && echo "diskutil available"
@@ -101,25 +100,40 @@ Docker is running
 
 ## Build DSpico firmware
 
-The current DSpico firmware release does not provide a downloadable `DSpico.uf2` asset, so a from-scratch setup uses the repository-managed Docker builder. See the [DSpico firmware releases](https://github.com/LNH-team/dspico-firmware/releases) and the [DSpico Doctor firmware-builder reference](../../tools/firmware-builder/README.md).
+The current DSpico firmware release does not provide a downloadable `DSpico.uf2` asset, so a from-scratch setup uses the DSpico Doctor Docker builder. The builder downloads and pins its required public upstream source repositories inside the container, so the complete DSpico Doctor repository is not required on the Mac. See the [DSpico firmware releases](https://github.com/LNH-team/dspico-firmware/releases) and the [DSpico Doctor firmware-builder reference](../../tools/firmware-builder/README.md).
 
-### 5. Create a setup workspace
+### 5. Create a firmware-builder workspace
 
 Run:
 
 ```bash
-mkdir -p "$HOME/Documents/DSpico-Setup"
-cd "$HOME/Documents/DSpico-Setup"
+mkdir -p "$HOME/Documents/DSpico-Setup/firmware-builder"
+cd "$HOME/Documents/DSpico-Setup/firmware-builder"
 ```
 
-### 6. Download DSpico Doctor
+### 6. Download and verify the validated Dockerfile
 
-Clone the public repository to the Mac:
+Download the exact DSpico Doctor Dockerfile selected for this guide:
 
 ```bash
-git clone https://github.com/benjamingarcia-labs/dspico-doctor.git
-cd dspico-doctor/tools/firmware-builder
+curl -L \
+  -o Dockerfile \
+  "https://raw.githubusercontent.com/benjamingarcia-labs/dspico-doctor/e092b93203c194fca8a1abd948385b06a4a3d9b4/tools/firmware-builder/Dockerfile"
 ```
+
+Verify the downloaded file:
+
+```bash
+shasum -a 256 Dockerfile
+```
+
+Expected SHA-256:
+
+```text
+b3a84ee692560eb63f04ad894c4e730ed5bde0440c0c9dbb8d554d5433f4df39
+```
+
+Stop if the hash does not match. Delete the downloaded `Dockerfile` and download it again before continuing.
 
 ### 7. Add the private firmware inputs
 
@@ -301,7 +315,7 @@ For background on RP2040 BOOTSEL behavior, see the [Raspberry Pi microcontroller
 Return to the firmware-builder directory if necessary:
 
 ```bash
-cd "$HOME/Documents/DSpico-Setup/dspico-doctor/tools/firmware-builder"
+cd "$HOME/Documents/DSpico-Setup/firmware-builder"
 ```
 
 Confirm that the firmware exists:
