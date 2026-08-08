@@ -110,6 +110,8 @@ Do not introduce a new framework, dependency, abstraction, or architecture patte
 
 Documentation is part of the contribution, not an optional follow-up.
 
+Follow the [Documentation Lifecycle](docs/documentation-lifecycle.md) when reviewing, updating, superseding, archiving, or removing durable documentation. Reviews are event-driven; a review does not require a modification when the document remains accurate.
+
 Update documentation whenever a change affects:
 
 * setup
