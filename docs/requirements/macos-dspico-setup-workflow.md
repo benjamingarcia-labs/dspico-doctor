@@ -1,6 +1,6 @@
 # Requirements: macOS DSpico Setup Workflow
 
-- **Status:** Approved requirements draft
+- **Status:** Approved requirements — amended 2026-08-07
 - **Related decision:** Decision 0001
 - **Tracking issue:** #15
 - **Selected deliverable:** Verified macOS DSpico setup workflow
@@ -17,7 +17,7 @@ The workflow shall cover:
 - handling macOS-specific filesystem behavior;
 - verifying the resulting setup;
 - performing a minimum hardware boot validation;
-- using Docker for compilation only when compilation is actually necessary;
+- using the validated Docker workflow to build DSpico firmware for a from-scratch setup while no official prebuilt `DSpico.uf2` asset is available;
 - keeping restricted, copyrighted, or user-specific content outside the public base installation.
 
 The workflow shall distinguish the source of material requirements instead of labeling every constraint as a DSpico requirement.
@@ -63,7 +63,7 @@ A successful installation shall leave the user with:
 - an inspectable and verifiable card configuration;
 - DSpico reaching a usable Pico Launcher file-browser interface on a documented tested hardware environment.
 
-Firmware compilation is not required for the base public setup unless a specific supported outcome requires it.
+For a from-scratch setup, the workflow shall produce and flash `DSpico.uf2` using the validated Docker build path while no suitable official prebuilt firmware asset is available. Users who already have compatible DSpico firmware installed may follow a documented skip path directly to microSD preparation.
 
 ## 5. Scope
 
@@ -82,7 +82,9 @@ The first version shall cover:
 - macOS metadata behavior and cleanup;
 - integrity verification;
 - minimum DSpico hardware boot validation;
-- optional Docker-based compilation where justified;
+- Docker-based DSpico firmware compilation for the from-scratch path;
+- `DSpico.uf2` verification and BOOTSEL flashing;
+- a documented firmware-build/flash skip path for hardware that already has compatible DSpico firmware installed;
 - legal and restricted-input boundaries;
 - destructive-operation recovery guidance.
 
@@ -426,18 +428,22 @@ The guide shall not rely on unofficial archives or piracy sources.
 
 ### LEGAL-03 — User-supplied inputs
 
-Where optional functionality requires restricted input, documentation may describe lawful user-supplied prerequisites without redistributing them.
+Where firmware construction or optional functionality requires restricted input, documentation may describe lawful user-supplied prerequisites without redistributing them.
 
 ### LEGAL-04 — Base public setup
 
-The complete default **public** installation shall remain possible without BIOS, NAND, game ROM, or other restricted content.
+The complete default **public microSD installation** shall remain possible without BIOS, NAND, game ROM, or other restricted content. A from-scratch firmware build may require lawful user-supplied restricted/private inputs when required by the upstream build process; those inputs shall remain outside the public repository and distribution path.
 
 ## 15. Compilation Requirements
 
-### BUILD-01 — Compilation is conditional
-**Source:** PROJECT requirement
+### BUILD-01 — Firmware build for a from-scratch setup
+**Source:** PROJECT requirement / UPSTREAM-COMPONENT / VALIDATED-CONFIG
 
-Compilation shall not be part of the required beginner path unless necessary for a supported result.
+While the current upstream firmware release does not provide a suitable prebuilt `DSpico.uf2` asset, the normal from-scratch macOS setup path shall build DSpico firmware using the validated Docker workflow.
+
+Users who already have compatible DSpico firmware installed shall have an explicit skip path to microSD preparation.
+
+If upstream later publishes a suitable official prebuilt `DSpico.uf2`, this requirement shall be re-evaluated rather than assuming compilation must remain mandatory.
 
 ### BUILD-02 — Reproducibility
 **Source:** PROJECT-SAFETY / UPSTREAM-COMPONENT
@@ -465,6 +471,18 @@ A successful build proves compilation only.
 **Source:** maintainability
 
 The workflow should expose the intended firmware artifact, not unrelated build-directory remnants.
+
+### BUILD-06 — Firmware artifact identity
+**Source:** PROJECT-SAFETY / VALIDATED-CONFIG
+
+The workflow shall clearly identify `DSpico.uf2` as firmware for the DSpico RP2040 internal flash. It shall not instruct users to place `DSpico.uf2` on the removable microSD.
+
+### BUILD-07 — BOOTSEL flashing
+**Source:** DSPICO / PROJECT-SAFETY
+
+The from-scratch workflow shall document how to enter DSpico BOOTSEL mode, positively identify the RP2040 BOOTSEL USB device, copy the verified `DSpico.uf2` to that device, and confirm the expected post-flash behavior.
+
+Firmware flashing guidance shall define the expected result, meaningful risk, stop condition, verification, and recovery path before the write is performed.
 
 ## 16. Verification Requirements
 
@@ -598,12 +616,16 @@ The deliverable shall not be considered to satisfy these requirements until evid
 12. optional and restricted features are clearly differentiated;
 13. macOS AppleDouble behavior is addressed;
 14. critical copied files can be verified;
-15. no restricted material is required for the complete default public installation;
-16. the prepared setup passes the minimum hardware boot test;
-17. the validation environment is recorded;
-18. unsupported and untested environments are explicit;
-19. stop and recovery conditions exist for consequential operations;
-20. maintenance/revalidation triggers are defined.
+15. no restricted material is required for the complete default public microSD installation;
+16. the from-scratch path produces and verifies `DSpico.uf2` using the validated Docker workflow while no suitable official prebuilt firmware asset is available;
+17. lawful user-supplied restricted/private firmware-build inputs remain outside the public repository and distribution path;
+18. `DSpico.uf2` is flashed through the DSpico BOOTSEL device rather than placed on the microSD;
+19. a firmware-build/flash skip path is explicit for hardware that already has compatible firmware installed;
+20. the prepared setup passes the minimum hardware boot test;
+21. the validation environment is recorded;
+22. unsupported and untested environments are explicit;
+23. stop and recovery conditions exist for consequential operations;
+24. maintenance/revalidation triggers are defined.
 
 ## 21. Required Validation Categories
 
@@ -612,7 +634,10 @@ Phase 4 validation shall plan for:
 - prerequisite verification;
 - release-artifact verification;
 - default-release structure comparison;
-- Docker build reproduction where applicable;
+- Docker firmware-build reproduction;
+- firmware-artifact verification;
+- BOOTSEL identification and flashing safeguards;
+- firmware-build/flash skip-path validation;
 - dependency recording;
 - removable-disk identification;
 - destructive-operation safeguards;
@@ -703,15 +728,11 @@ Larger or smaller capacities should remain **untested** rather than being declar
 
 This is not blocking the first release.
 
-### Q3 — Compilation placement
+### Q3 — Future prebuilt firmware availability
 
-We still need to decide whether the Docker compilation workflow belongs:
+The current upstream tagged firmware release does not publish a suitable prebuilt `DSpico.uf2`, so the validated Docker build belongs in the normal from-scratch macOS path.
 
-- in the primary setup guide;
-- in an optional advanced section;
-- or in a separately linked guide.
-
-Current recommendation: keep compilation out of the normal beginner path unless it is required for a feature the base public release cannot provide.
+If upstream later publishes a suitable official prebuilt firmware asset, DSpico Doctor shall re-evaluate whether the Docker build should remain mandatory, become an advanced path, or be retained only for reproducibility/development.
 
 ## Traceability and Validation Boundary
 
