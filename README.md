@@ -2,7 +2,7 @@
 
 DSpico Doctor is an independent, open-source project focused on making the DSpico ecosystem easier to understand, diagnose, maintain, and recover safely.
 
-The project is currently establishing its technical foundation through user-problem research, upstream repository analysis, system documentation, and disciplined contribution practices. Its first DSpico Doctor-owned deliverable has now been selected: a verified macOS DSpico setup workflow covering Docker-based compilation where needed, safe FAT32/MBR microSD preparation, public file assembly, macOS metadata cleanup, and explicit validation and restricted-input boundaries. Requirements for that deliverable are defined, the repository-managed firmware builder has completed build-level revalidation, and the first end-user guide draft now exists. Complete workflow and hardware validation are still pending.
+The project is currently establishing its technical foundation through user-problem research, upstream repository analysis, system documentation, and disciplined contribution practices. Its first DSpico Doctor-owned deliverable is a verified macOS DSpico setup workflow covering Docker-based compilation where needed, safe FAT32/MBR microSD preparation, public file assembly, macOS metadata cleanup, and explicit validation and restricted-input boundaries. Requirements for that deliverable are defined, the repository-managed firmware builder has completed build-level revalidation, and the beginner-oriented end-user guide has completed the approved workflow and minimum hardware validation boundary on the recorded Apple Silicon macOS environment.
 
 ## Project Goals
 
@@ -19,7 +19,7 @@ The project favors small, understandable, testable contributions over broad or s
 
 ## Current Project Maturity
 
-DSpico Doctor is currently implementing and validating its first owned deliverable against approved requirements. The pinned repository-managed firmware builder has completed fresh no-cache build-level revalidation on the recorded Apple Silicon environment, and the first end-user macOS setup guide draft is now implemented. BOOTSEL flashing validation, complete workflow validation, beginner walkthrough validation, and release validation are still pending.
+DSpico Doctor has completed its first owned deliverable at the approved validation boundary. The pinned repository-managed firmware builder completed fresh no-cache build-level revalidation on the recorded Apple Silicon environment, and the beginner-oriented macOS setup guide has completed the documented end-to-end workflow and minimum hardware boot validation needed for the current scope.
 
 Work completed so far includes:
 
@@ -31,11 +31,13 @@ Work completed so far includes:
 - selecting the first DSpico Doctor-owned deliverable from reviewed and validated evidence;
 - defining requirements, scope, safety boundaries, acceptance criteria, and validation categories for the selected macOS setup workflow;
 - implementing and freshly revalidating the pinned repository-managed Docker firmware builder at the build level on the recorded Apple Silicon environment;
-- implementing the first beginner-oriented macOS setup guide draft for end-to-end review and validation.
+- implementing and validating the beginner-oriented macOS setup guide through the approved workflow and minimum hardware boot acceptance boundary.
 
-The repository does not currently provide a released diagnostic application, automated recovery tool, firmware modification, or fully validated end-user setup utility.
+The current evidence does not establish broad macOS support, all-card compatibility, all-console compatibility, game compatibility, DSiWare compatibility, emuNAND compatibility, or other behavior beyond the recorded validation environment and workflow.
 
-Planned or in-progress capabilities should not be treated as supported until implementation, testing, review, and release evidence are available.
+The repository does not currently provide a released diagnostic application, automated recovery tool, or firmware modification.
+
+Planned or in-progress capabilities should not be treated as supported until implementation, testing, review, and applicable release evidence are available.
 
 ## Repository Navigation
 
@@ -49,11 +51,11 @@ Planned or in-progress capabilities should not be treated as supported until imp
 
 ### Guides
 
-- [macOS DSpico Setup Guide](docs/guides/macos-dspico-setup.md) — Beginner-oriented end-to-end setup draft covering local firmware preparation, BOOTSEL flashing, microSD preparation, public Launcher/Loader installation, macOS metadata cleanup, and minimum hardware verification. Complete workflow validation is still pending.
+- [macOS DSpico Setup Guide](docs/guides/macos-dspico-setup.md) — Beginner-oriented end-to-end setup guide covering local firmware preparation, BOOTSEL flashing, microSD preparation, public Launcher/Loader installation, macOS metadata cleanup, verification, and minimum hardware boot validation on the recorded Apple Silicon macOS environment.
 
 ### Implementation
 
-- [DSpico Firmware Builder](tools/firmware-builder/README.md) — Contains the pinned Docker firmware-build support used by the macOS setup workflow. This repository version has completed build-level revalidation on the recorded Apple Silicon environment; hardware and complete-workflow validation remain pending.
+- [DSpico Firmware Builder](tools/firmware-builder/README.md) — Contains the pinned Docker firmware-build support used by the macOS setup workflow. This repository version completed build-level revalidation on the recorded Apple Silicon environment and is incorporated into the validated macOS setup workflow.
 
 ### Research
 
