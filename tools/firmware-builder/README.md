@@ -2,7 +2,7 @@
 
 This directory contains the DSpico Doctor Docker build recipe used by the macOS setup workflow to produce `DSpico.uf2` when no suitable official prebuilt firmware asset is available.
 
-This README documents the builder's implementation contract, pinned dependencies, restricted-input boundary, and validation evidence. It is not the end-user setup procedure. The complete beginner-oriented macOS procedure is being implemented under [Issue #23](https://github.com/benjamingarcia-labs/dspico-doctor/issues/23) and will be linked here once the guide exists.
+This README documents the builder's implementation contract, pinned dependencies, restricted-input boundary, and validation evidence. It is not the end-user setup procedure. For the complete beginner-oriented macOS procedure, use the [macOS DSpico Setup Guide](../../docs/guides/macos-dspico-setup.md).
 
 ## Status
 
@@ -44,7 +44,7 @@ output/DSpico.uf2
 
 `DSpico.uf2` is firmware for the DSpico RP2040 internal flash. It is flashed through the RP2040 BOOTSEL USB device. It does **not** belong on the removable DSpico microSD card.
 
-For the complete user procedure—prerequisite checks, private-input placement and verification, Docker execution, artifact extraction, BOOTSEL flashing, microSD preparation, and hardware validation—follow [Issue #23](https://github.com/benjamingarcia-labs/dspico-doctor/issues/23) until the dedicated macOS setup guide is published.
+For prerequisite checks, private-input placement and verification, Docker execution, artifact extraction, BOOTSEL flashing, microSD preparation, and hardware validation, follow the [macOS DSpico Setup Guide](../../docs/guides/macos-dspico-setup.md).
 
 ## Restricted-input boundary
 
@@ -122,6 +122,7 @@ A successful build proves compilation only. It does not prove BOOTSEL flashing, 
 
 ## Technical references
 
+- [macOS DSpico Setup Guide](../../docs/guides/macos-dspico-setup.md)
 - [Issue #14 — deliverable selection evidence and controlled reproduction history](https://github.com/benjamingarcia-labs/dspico-doctor/issues/14)
 - [Issue #23 — macOS setup workflow implementation and validation](https://github.com/benjamingarcia-labs/dspico-doctor/issues/23)
 - [macOS DSpico Setup Workflow Requirements](../../docs/requirements/macos-dspico-setup-workflow.md)
