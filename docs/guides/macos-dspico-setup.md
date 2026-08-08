@@ -121,8 +121,6 @@ git clone https://github.com/benjamingarcia-labs/dspico-doctor.git
 cd dspico-doctor/tools/firmware-builder
 ```
 
-This downloads a local copy of the public project. The setup procedure does not upload files to GitHub.
-
 ### 7. Add the private firmware inputs
 
 Create the local input directory:
@@ -214,9 +212,53 @@ Record the SHA-256 value. The firmware embeds its compilation date, so otherwise
 
 ### Optional: build without Wrfuxxed
 
-Upstream DSpico treats Wrfuxxed as optional. A build without Wrfuxxed does not require `wrfu.srl` and omits the Wrfuxxed build, DLDI patch, `roms/dsimode.nds` copy, payload copy, and `DSPICO_ENABLE_WRFUXXED` enablement steps.
+> **Untested by DSpico Doctor:** The following alternate profile is derived from the current upstream DSpico build instructions. DSpico Doctor has not independently built or hardware-validated this no-Wrfuxxed variant on macOS.
 
-The current DSpico Doctor Dockerfile represents the Wrfuxxed-enabled profile that was independently validated. A no-Wrfuxxed macOS Docker build has **not** been independently validated by DSpico Doctor. Users who need that configuration should follow the corresponding non-Wrfuxxed steps in the [official DSpico build guide](https://github.com/LNH-team/dspico/blob/develop/GUIDE.md) and treat the result as untested by DSpico Doctor.
+A no-Wrfuxxed build does not require `wrfu.srl`. Keep `biosnds7.rom` and `biosdsi7.rom` in `private-inputs/`, then create a local alternate Dockerfile from the validated builder:
+
+```bash
+cp Dockerfile Dockerfile.no-wrfuxxed
+```
+
+Remove the Wrfuxxed-specific build and copy steps:
+
+```bash
+sed -i '' \
+  -e '/dspico-wrfuxxed/d' \
+  -e '/wrfu\.srl/d' \
+  -e '/uartBufv060\.bin/d' \
+  -e '/DSPICO_ENABLE_WRFUXXED/d' \
+  Dockerfile.no-wrfuxxed
+```
+
+Build the alternate profile:
+
+```bash
+docker build \
+  --progress=plain \
+  --file Dockerfile.no-wrfuxxed \
+  --tag dspico-doctor-builder:no-wrfuxxed .
+```
+
+Extract the resulting firmware:
+
+```bash
+mkdir -p output
+container_id="$(docker create dspico-doctor-builder:no-wrfuxxed)"
+docker cp \
+  "$container_id:/opt/dspico-firmware/build/DSpico.uf2" \
+  ./output/DSpico.no-wrfuxxed.uf2
+docker rm "$container_id"
+```
+
+Verify and record the result:
+
+```bash
+stat -f '%z bytes' output/DSpico.no-wrfuxxed.uf2
+shasum -a 256 output/DSpico.no-wrfuxxed.uf2
+```
+
+If this alternate build fails, use the validated Wrfuxxed-enabled profile or follow the [official DSpico build guide](https://github.com/LNH-team/dspico/blob/develop/GUIDE.md). Do not treat the no-Wrfuxxed profile as independently validated by DSpico Doctor.
 
 ---
 
@@ -278,6 +320,8 @@ Do not disconnect the USB cable while the file is being copied.
 
 After the UF2 is accepted, the RP2040 normally exits BOOTSEL and the `RPI-RP2` volume disappears. Disconnect the DSpico from USB after the copy completes.
 
+If the no-Wrfuxxed alternate profile was built instead, flash `output/DSpico.no-wrfuxxed.uf2` in place of `output/DSpico.uf2`.
+
 ### 13. BOOTSEL recovery
 
 If the DSpico does not behave as expected after flashing:
@@ -286,7 +330,7 @@ If the DSpico does not behave as expected after flashing:
 2. remove the microSD card;
 3. hold BOOTSEL while reconnecting USB;
 4. confirm that the BOOTSEL volume appears;
-5. reflash a verified `DSpico.uf2`.
+5. reflash a verified firmware artifact.
 
 Stop if the BOOTSEL device cannot be identified or restored using the documented method.
 
