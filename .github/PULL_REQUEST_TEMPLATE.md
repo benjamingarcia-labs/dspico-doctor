@@ -62,6 +62,10 @@ List documentation created or updated:
 
 Explain why no documentation change was needed, if applicable:
 
+README impact review and result:
+
+-
+
 ## Risks and Limitations
 
 -
@@ -78,6 +82,7 @@ Explain why no documentation change was needed, if applicable:
 - [ ] Expected and actual test results are documented
 - [ ] Likely regressions were considered
 - [ ] Documentation was updated where needed
+- [ ] Root and affected-directory README impact was reviewed and the update or no-change result was recorded
 - [ ] Known limitations and unverified behavior are stated
 - [ ] External code or content is properly licensed and attributed
 - [ ] The change is not presented as an official upstream feature unless accepted upstream
