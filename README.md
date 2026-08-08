@@ -2,7 +2,7 @@
 
 DSpico Doctor is an independent, open-source project focused on making the DSpico ecosystem easier to understand, diagnose, maintain, and recover safely.
 
-The project is currently establishing its technical foundation through user-problem research, upstream repository analysis, system documentation, and disciplined contribution practices. Its first DSpico Doctor-owned deliverable has now been selected: a verified macOS DSpico setup workflow covering Docker-based compilation where needed, safe FAT32/MBR microSD preparation, public file assembly, macOS metadata cleanup, and explicit validation and restricted-input boundaries. The deliverable has not yet been implemented or released.
+The project is currently establishing its technical foundation through user-problem research, upstream repository analysis, system documentation, and disciplined contribution practices. Its first DSpico Doctor-owned deliverable has now been selected: a verified macOS DSpico setup workflow covering Docker-based compilation where needed, safe FAT32/MBR microSD preparation, public file assembly, macOS metadata cleanup, and explicit validation and restricted-input boundaries. Requirements for that deliverable have now been defined; the deliverable itself has not yet been implemented or released.
 
 ## Project Goals
 
@@ -19,7 +19,7 @@ The project favors small, understandable, testable contributions over broad or s
 
 ## Current Project Maturity
 
-DSpico Doctor is currently in the research and project-definition stage, with its first owned deliverable selected and follow-on requirements work still pending.
+DSpico Doctor is currently in the specification stage for its first owned deliverable. The deliverable has been selected and its requirements are defined; implementation and release work have not yet begun.
 
 Work completed so far includes:
 
@@ -28,7 +28,8 @@ Work completed so far includes:
 - documenting an initial high-level system overview;
 - establishing contribution guidance and structured issue templates;
 - contributing a focused documentation correction to the upstream DSpico project;
-- selecting the first DSpico Doctor-owned deliverable from reviewed and validated evidence.
+- selecting the first DSpico Doctor-owned deliverable from reviewed and validated evidence;
+- defining requirements, scope, safety boundaries, acceptance criteria, and validation categories for the selected macOS setup workflow.
 
 The repository does not currently provide a released diagnostic application, automated recovery tool, firmware modification, or verified end-user setup utility.
 
@@ -42,6 +43,7 @@ Planned capabilities should not be treated as implemented or supported until req
 - [Project Charter](docs/project-charter.md) — Defines the initial user problem, scope, non-goals, constraints, risks, and research questions.
 - [Project Roadmap](docs/roadmap.md) — Defines the project's phase gates from foundational research through deliverable selection, implementation, validation, and release preparation.
 - [Decision 0001: First Owned Deliverable](docs/decisions/0001-select-first-dspico-doctor-deliverable.md) — Records the evidence-backed selection of the project's first owned deliverable and its validation boundaries.
+- [macOS DSpico Setup Workflow Requirements](docs/requirements/macos-dspico-setup-workflow.md) — Defines the approved scope, requirement provenance, safety boundaries, acceptance criteria, validation categories, and current supported environment for the first owned deliverable.
 
 ### Research
 
