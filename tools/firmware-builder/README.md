@@ -2,9 +2,11 @@
 
 This directory contains the DSpico Doctor Docker build recipe used by the macOS setup workflow to produce `DSpico.uf2` when no suitable official prebuilt firmware asset is available.
 
+This README documents the builder's implementation contract, pinned dependencies, restricted-input boundary, and validation evidence. It is not the end-user setup procedure. The complete beginner-oriented macOS procedure is being implemented under [Issue #23](https://github.com/benjamingarcia-labs/dspico-doctor/issues/23) and will be linked here once the guide exists.
+
 ## Status
 
-This repository version was freshly revalidated on the recorded Apple Silicon macOS environment for Issue #23. Validation used the reorganized local `private-inputs/` layout, disabled Docker build cache, completed the full pinned build, extracted only `DSpico.uf2`, and confirmed that local private inputs and output artifacts remained ignored by Git.
+This repository version was freshly revalidated on the recorded Apple Silicon macOS environment for [Issue #23](https://github.com/benjamingarcia-labs/dspico-doctor/issues/23). Validation used the reorganized local `private-inputs/` layout, disabled Docker build cache, completed the full pinned build, extracted only `DSpico.uf2`, and confirmed that local private inputs and output artifacts remained ignored by Git.
 
 The fresh artifact was exactly `3,277,824` bytes. Its SHA-256 was `bab09ec584e7ba207885478ddb064ca23ae1b33965c9bfc2c643f8fe342c85d8`. A byte comparison against the earlier controlled reproduction found exactly one differing byte, corresponding to the embedded build date changing from `Aug  7 2026` to `Aug  8 2026`.
 
@@ -12,7 +14,7 @@ This is build-level validation only. It does not prove BOOTSEL flashing, runtime
 
 ## Supported validation target
 
-Initial DSpico Doctor validation targets:
+Initial DSpico Doctor validation target:
 
 ```text
 Apple Silicon Mac
@@ -23,15 +25,9 @@ Docker Desktop / ARM64 container execution
 
 Other hosts are currently untested by DSpico Doctor.
 
-## Local-only private inputs
+## Builder interface
 
-Create a local directory named:
-
-```text
-private-inputs/
-```
-
-and place these user-supplied files inside it:
+The builder expects three local, user-supplied inputs under `private-inputs/`:
 
 ```text
 private-inputs/
@@ -39,6 +35,18 @@ private-inputs/
 ├── biosdsi7.rom
 └── wrfu.srl
 ```
+
+The build produces the firmware artifact that the setup workflow extracts as:
+
+```text
+output/DSpico.uf2
+```
+
+`DSpico.uf2` is firmware for the DSpico RP2040 internal flash. It is flashed through the RP2040 BOOTSEL USB device. It does **not** belong on the removable DSpico microSD card.
+
+For the complete user procedure—prerequisite checks, private-input placement and verification, Docker execution, artifact extraction, BOOTSEL flashing, microSD preparation, and hardware validation—follow [Issue #23](https://github.com/benjamingarcia-labs/dspico-doctor/issues/23) until the dedicated macOS setup guide is published.
+
+## Restricted-input boundary
 
 The exact inputs used during the controlled reproduction had these SHA-256 values:
 
@@ -55,7 +63,7 @@ wrfu.srl
 
 These hashes are file-identity evidence for the validated configuration. They do not establish ownership or permission to possess or use the files.
 
-DSpico Doctor does not distribute, mirror, embed, upload, or provide unofficial acquisition instructions for these inputs. The local `private-inputs/` directory is ignored by Git and must remain outside the public repository and distribution path.
+DSpico Doctor does not distribute, mirror, embed, upload, or provide unofficial acquisition instructions for these inputs. The local `private-inputs/` directory is ignored by Git and must remain outside the public repository and distribution path. Filename-level ignore rules also protect these restricted inputs and generated `DSpico.uf2` against accidental tracking elsewhere under this builder directory.
 
 ## Pinned build inputs
 
@@ -92,45 +100,9 @@ dspico-firmware/pico-sdk
 6a7db34ff63345a7badec79ebea3aaef1712f374
 ```
 
-## Build
+These revisions are maintenance and reproducibility evidence. The upstream repositories remain authoritative for their own source code and behavior.
 
-From this directory, after Docker is running and the three private inputs have been placed and verified:
-
-```bash
-docker build \
-  --progress=plain \
-  --file Dockerfile \
-  --tag dspico-doctor-builder .
-```
-
-A successful Docker build proves compilation only. It does not prove hardware behavior.
-
-## Extract the firmware artifact
-
-Create the ignored local output directory:
-
-```bash
-mkdir -p output
-```
-
-Create a temporary container, copy only the firmware artifact, then remove the container:
-
-```bash
-container_id="$(docker create dspico-doctor-builder)"
-
-docker cp \
-  "$container_id:/opt/dspico-firmware/build/DSpico.uf2" \
-  ./output/DSpico.uf2
-
-docker rm "$container_id"
-```
-
-Verify the artifact exists and record its identity:
-
-```bash
-ls -lh output/DSpico.uf2
-shasum -a 256 output/DSpico.uf2
-```
+## Validation evidence
 
 The earlier controlled reproduction produced a `DSpico.uf2` exactly `3,277,824` bytes in size with SHA-256:
 
@@ -146,17 +118,18 @@ bab09ec584e7ba207885478ddb064ca23ae1b33965c9bfc2c643f8fe342c85d8
 
 A byte comparison found exactly one differing byte, explained by the embedded build date changing from `Aug  7 2026` to `Aug  8 2026`. These hashes are validation evidence, not universal required hashes for future builds.
 
-## Firmware destination
-
-`DSpico.uf2` is firmware for the DSpico RP2040 internal flash. It is flashed through the RP2040 BOOTSEL USB device.
-
-It does **not** belong on the removable DSpico microSD card.
+A successful build proves compilation only. It does not prove BOOTSEL flashing, runtime behavior, hardware compatibility, microSD preparation, or broad compatibility.
 
 ## Technical references
 
-- Issue #14 — selection evidence and controlled reproduction history
-- Issue #23 — current implementation and validation tracking
-- `docs/requirements/macos-dspico-setup-workflow.md` — approved requirements and acceptance criteria
-- `docs/decisions/0001-select-first-dspico-doctor-deliverable.md` — deliverable selection and validation boundaries
+- [Issue #14 — deliverable selection evidence and controlled reproduction history](https://github.com/benjamingarcia-labs/dspico-doctor/issues/14)
+- [Issue #23 — macOS setup workflow implementation and validation](https://github.com/benjamingarcia-labs/dspico-doctor/issues/23)
+- [macOS DSpico Setup Workflow Requirements](../../docs/requirements/macos-dspico-setup-workflow.md)
+- [Decision 0001: Select First DSpico Doctor Deliverable](../../docs/decisions/0001-select-first-dspico-doctor-deliverable.md)
+- [Upstream DSpico firmware repository](https://github.com/LNH-team/dspico-firmware)
+- [Upstream DSpico bootloader repository](https://github.com/LNH-team/dspico-bootloader)
+- [Upstream DSpico DLDI repository](https://github.com/LNH-team/dspico-dldi)
+- [Upstream DSpico Wrfuxxed repository](https://github.com/LNH-team/dspico-wrfuxxed)
+- [Upstream DSRomEncryptor repository](https://github.com/Gericom/DSRomEncryptor)
 
 The upstream DSpico repositories remain authoritative for DSpico source code and behavior. This builder is an independent DSpico Doctor support artifact.
