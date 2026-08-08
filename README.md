@@ -2,7 +2,7 @@
 
 DSpico Doctor is an independent, open-source project focused on making the DSpico ecosystem easier to understand, diagnose, maintain, and recover safely.
 
-The project is currently establishing its technical foundation through user-problem research, upstream repository analysis, system documentation, and disciplined contribution practices. Its first DSpico Doctor-owned deliverable has now been selected: a verified macOS DSpico setup workflow covering Docker-based compilation where needed, safe FAT32/MBR microSD preparation, public file assembly, macOS metadata cleanup, and explicit validation and restricted-input boundaries. Requirements for that deliverable are defined, and implementation has begun with a repository-managed firmware-builder candidate. The builder and complete deliverable have not yet been fully revalidated or released.
+The project is currently establishing its technical foundation through user-problem research, upstream repository analysis, system documentation, and disciplined contribution practices. Its first DSpico Doctor-owned deliverable has now been selected: a verified macOS DSpico setup workflow covering Docker-based compilation where needed, safe FAT32/MBR microSD preparation, public file assembly, macOS metadata cleanup, and explicit validation and restricted-input boundaries. Requirements for that deliverable are defined, and implementation has begun with a repository-managed firmware builder that has completed build-level revalidation on the recorded Apple Silicon macOS environment. The complete deliverable has not yet been fully validated or released.
 
 ## Project Goals
 
@@ -19,7 +19,7 @@ The project favors small, understandable, testable contributions over broad or s
 
 ## Current Project Maturity
 
-DSpico Doctor is currently implementing its first owned deliverable against approved requirements. A pinned firmware-builder candidate has been added for controlled revalidation; the end-user macOS setup guide and release validation are still pending.
+DSpico Doctor is currently implementing its first owned deliverable against approved requirements. The pinned repository-managed firmware builder has completed fresh no-cache build-level revalidation on the recorded Apple Silicon environment; the end-user macOS setup guide, BOOTSEL flashing validation, complete workflow validation, and release validation are still pending.
 
 Work completed so far includes:
 
@@ -30,7 +30,7 @@ Work completed so far includes:
 - contributing a focused documentation correction to the upstream DSpico project;
 - selecting the first DSpico Doctor-owned deliverable from reviewed and validated evidence;
 - defining requirements, scope, safety boundaries, acceptance criteria, and validation categories for the selected macOS setup workflow;
-- beginning implementation with a repository-managed, pinned Docker firmware-builder candidate derived from the controlled Apple Silicon reproduction.
+- implementing and freshly revalidating the pinned repository-managed Docker firmware builder at the build level on the recorded Apple Silicon environment.
 
 The repository does not currently provide a released diagnostic application, automated recovery tool, firmware modification, or verified end-user setup utility.
 
@@ -48,7 +48,7 @@ Planned or in-progress capabilities should not be treated as supported until imp
 
 ### Implementation
 
-- [DSpico Firmware Builder](tools/firmware-builder/README.md) — Contains the pinned Docker firmware-build candidate used by the macOS setup workflow. This repository version is pending controlled revalidation before it is treated as a validated user-facing dependency.
+- [DSpico Firmware Builder](tools/firmware-builder/README.md) — Contains the pinned Docker firmware-build support used by the macOS setup workflow. This repository version has completed build-level revalidation on the recorded Apple Silicon environment; hardware and complete-workflow validation remain pending.
 
 ### Research
 
