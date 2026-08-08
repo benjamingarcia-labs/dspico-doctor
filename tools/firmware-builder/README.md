@@ -4,7 +4,11 @@ This directory contains the DSpico Doctor Docker build recipe used by the macOS 
 
 ## Status
 
-This repository version is an **implementation candidate pending revalidation**. It is derived from the controlled Apple Silicon reproduction recorded in Issue #14, but its private-input paths were intentionally reorganized for a safer public layout. Do not treat this version as validated until Issue #23 records a successful rebuild and artifact comparison.
+This repository version was freshly revalidated on the recorded Apple Silicon macOS environment for Issue #23. Validation used the reorganized local `private-inputs/` layout, disabled Docker build cache, completed the full pinned build, extracted only `DSpico.uf2`, and confirmed that local private inputs and output artifacts remained ignored by Git.
+
+The fresh artifact was exactly `3,277,824` bytes. Its SHA-256 was `bab09ec584e7ba207885478ddb064ca23ae1b33965c9bfc2c643f8fe342c85d8`. A byte comparison against the earlier controlled reproduction found exactly one differing byte, corresponding to the embedded build date changing from `Aug  7 2026` to `Aug  8 2026`.
+
+This is build-level validation only. It does not prove BOOTSEL flashing, runtime behavior, hardware compatibility, or the complete macOS setup workflow.
 
 ## Supported validation target
 
@@ -134,7 +138,13 @@ The earlier controlled reproduction produced a `DSpico.uf2` exactly `3,277,824` 
 c29aceb95478300fdeb00423420e164697e326e4832a4e7e3ce52a1f0373b789
 ```
 
-That hash is evidence from one recorded build, not a universal required hash. Comparison with the historical known-working artifact showed that only the embedded build-date bytes differed.
+The fresh no-cache repository validation produced the same file size with SHA-256:
+
+```text
+bab09ec584e7ba207885478ddb064ca23ae1b33965c9bfc2c643f8fe342c85d8
+```
+
+A byte comparison found exactly one differing byte, explained by the embedded build date changing from `Aug  7 2026` to `Aug  8 2026`. These hashes are validation evidence, not universal required hashes for future builds.
 
 ## Firmware destination
 
